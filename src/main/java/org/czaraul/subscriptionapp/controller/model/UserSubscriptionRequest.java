@@ -1,7 +1,10 @@
 package org.czaraul.subscriptionapp.controller.model;
 
+import lombok.Builder;
+
 import java.util.Date;
 
+@Builder
 public class UserSubscriptionRequest {
 
     private Long id;
@@ -11,6 +14,14 @@ public class UserSubscriptionRequest {
     private Date endDate;
 
     public UserSubscriptionRequest() { // Default constructor
+    }
+
+    public UserSubscriptionRequest(Long id, String userName, String productName, Date startDate, Date endDate) {
+        this.id = id;
+        this.userName = userName;
+        this.productName = productName;
+        this.startDate = startDate;
+        this.endDate = endDate;
     }
 
     public UserSubscriptionRequest(String userName, String productName, Date startDate, Date endDate) {

@@ -33,6 +33,11 @@ public class UserSubscriptionController {
     private LocalDate tokenExpiration;
 
 
+    public UserSubscriptionController(UserSubscriptionService userSubscriptionService, MockedSDK mockSecretsManager) {
+        this.userSubscriptionService = userSubscriptionService;
+        this.mockSecretsManager = mockSecretsManager;
+    }
+
     @PostMapping
     public ResponseEntity<UserSubscriptionResponse> createUserSubscription(@RequestBody UserSubscriptionRequest userSubscription) {
         try {
@@ -41,7 +46,6 @@ public class UserSubscriptionController {
             String policyReference = UUID.randomUUID().toString();
 
             createInsurancePolicy(policyReference, createdSubscription.getStartDate(), createdSubscription.getEndDate());
-
 
             return new ResponseEntity<>(createdSubscription, HttpStatus.CREATED);
 
@@ -52,11 +56,13 @@ public class UserSubscriptionController {
     }
 
 
-    private void createInsurancePolicy(String policyReference, Date startDate, Date endDate) {
+    public void createInsurancePolicy(String policyReference, Date startDate, Date endDate) {
 
         if (insuranceApiToken == null || tokenExpiration == null || tokenExpiration.isBefore(LocalDate.now())) {
             insuranceApiToken = getInsuranceApiTokenFromSecrets();
-            tokenExpiration = LocalDate.now().plusYears(1);
+            this.setTokenExpiration(LocalDate.now().plusWeeks(1));
+
+            System.out.println("After expiration set: " + this.getTokenExpiration());
         }
 
         // Mock the API call to insurance.com (replace with actual API call if/when available)
@@ -72,5 +78,19 @@ public class UserSubscriptionController {
         return mockSecretsManager.getSecretValue();
     }
 
+    public LocalDate getTokenExpiration() {
+        return tokenExpiration;
+    }
 
+    public void setTokenExpiration(LocalDate tokenExpiration) {
+        this.tokenExpiration = tokenExpiration;
+    }
+
+    public String getInsuranceApiToken() {
+        return insuranceApiToken;
+    }
+
+    public void setInsuranceApiToken(String insuranceApiToken) {
+        this.insuranceApiToken = insuranceApiToken;
+    }
 }
